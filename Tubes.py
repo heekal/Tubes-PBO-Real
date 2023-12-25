@@ -198,12 +198,12 @@ class CustomerService(bank):
     def __init__(self, username, name, password, mode):
         super().__init__(username, name, password, mode)
     
-    def tambah_nasabah(self):
+    def tambah_data(self):
         print('Tolong Isi Data Di bawah ini: ')
         tujuan = nasabah
         self.tambahData(tujuan, 'cs')
     
-    def edit_nasabah(self):
+    def edit_data(self):
         self.cek_anggota('cs', nasabah, 'transaksi')
         print('Pilih Data Nasabah yang ingin Diganti')
         tujuan = nasabah
@@ -222,13 +222,13 @@ class Teller(bank):
     def __init__(self, username, name, password, mode):
         super().__init__(username, name, password, mode)
     
-    def tambah_data_nasabah(self):
+    def tambah_data(self):
         tujuan = nasabah
         self.cek_anggota(' ', tujuan, 'username')
         print('Tolong Isi Data Dibawah ini:')
         self.gantiData(tujuan, 'teller')
 
-    def lihat_data_nasabah(self):
+    def lihat_data(self):
         tujuan = nasabah
         self.cek_anggota('teller', tujuan, 'transaksi')
 
@@ -306,9 +306,9 @@ while start == True:
                 mode.menu()
                 opsi = int(input('Pilihanmu: '))
                 if opsi == 1:
-                    mode.tambah_nasabah()
+                    mode.tambah_data()
                 elif opsi == 2:
-                    mode.edit_nasabah()
+                    mode.edit_data()
                 else: 
                     break
         else :
@@ -321,9 +321,9 @@ while start == True:
                 mode.menu()
                 opsi = int(input('Pilihan kamu: '))
                 if opsi == 1:
-                    mode.tambah_data_nasabah()
+                    mode.tambah_data()
                 elif opsi == 2:
-                    mode.lihat_data_nasabah()
+                    mode.lihat_data()
                 else:
                     break
         else :

@@ -114,7 +114,7 @@ class bank:
     def cek_anggota(self, role, key):
         print(f'No.\tNama\t{key}')
         for i in range(len(role[key])):
-             print(f"{i+1}.\t{role['username'][i]}\t{role[key][i]}")
+             print(f"{i+1}.\t{role['name'][i]}\t{role[key][i]}")
 
     def cek_keuangan(self, find, key):
         total = 0
@@ -217,10 +217,14 @@ class Teller(bank):
         super().__init__(username, name, password, mode)
     
     def tambah_data_nasabah(self):
-        pass
+        tujuan = nasabah
+        self.cek_anggota(tujuan, 'username')
+        print('Tolong Isi Data Dibawah ini:')
+        self.gantiData(tujuan, 'teller')
 
     def lihat_data_nasabah(self):
-        pass
+        tujuan = nasabah
+        self.cek_anggota(tujuan, 'transaksi')
 
     def verifikasi(self):
         return self.cari_akun(self.username, self._password, self.mode)
@@ -289,6 +293,8 @@ while menu == True:
                     mode.lihat_data(teller, 'name')
                 else:
                     break
+        else :
+            print('Akun Tidak Ditemukan!')
     elif role == 3:
         username, name, password = aplikasi.login(customer_service)
         mode = CustomerService(username, name, password, customer_service)
@@ -296,16 +302,17 @@ while menu == True:
             while True:
                 mode.menu()
                 opsi = int(input('Pilihanmu: '))
-
                 if opsi == 1:
                     mode.tambah_nasabah()
                 elif opsi == 2:
                     mode.edit_nasabah()
                 else: 
                     break
+        else :
+            print('Akun Tidak Ditemukan!')
     elif role == 4:
-        username, password = aplikasi.sign_in()
-        mode = Teller(username, password, teller)
+        username, name, password = aplikasi.login(teller)
+        mode = Teller(username, name, password, teller)
         if mode.verifikasi():
             while True:
                 mode.menu()
@@ -314,5 +321,9 @@ while menu == True:
                     mode.tambah_data_nasabah()
                 elif opsi == 2:
                     mode.lihat_data_nasabah()
+                else:
+                    break
+        else :
+            print('Akun Tidak Ditemukan!')
     elif role == 5:
         menu = aplikasi.keluar()

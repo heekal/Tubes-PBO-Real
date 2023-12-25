@@ -93,7 +93,6 @@ class bank:
             tujuan['username'].pop(index)
             tujuan['name'].pop(index)
             tujuan['password'].pop(index)
-
             print('Data Telah Dihapus !')
 
     def gantiData(self, tujuan, role):
@@ -220,6 +219,7 @@ class CustomerService(bank):
         self.tambahData(tujuan, 'teller')
     
     def edit_nasabah(self):
+        print('Pilih Data Nasabah yang ingin Diganti')
         tujuan = nasabah
         self.gantiData(tujuan)
 
@@ -281,7 +281,6 @@ while menu == True:
                         if option == 1:
                             mode.tambah_data(edit)
                         elif option == 2:
-                            print('Tolong isi data yang ingin di ganti')
                             mode.edit_data(edit)
                         else:
                             break
@@ -320,7 +319,6 @@ while menu == True:
                 if opsi == 1:
                     mode.tambah_nasabah()
                 elif opsi == 2:
-                    print('Pilih Data Nasabah yang ingin Diganti')
                     mode.edit_nasabah()
                 else: 
                     break

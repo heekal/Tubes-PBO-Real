@@ -24,15 +24,13 @@ teller = {
 
 nasabah = {
     'username' : ['Haikaltok', 'Luna', 'Arden', 'Bondan'],
-    'name' : [],
+    'name' : ['haikal', 'lunaa', 'raden', 'bono'],
     'password' : ['123', '321', '333', '444'],
     'transaksi' : [1050, 2020, 3000, 5000],
-    'keuangan' : {
-        'debit' : [1000, 2000, 3000, 4000],
-        'kredit' : [0, 0, 1, 2],
-        'bunga' : [5, 10, 6, 7], # dalam persen
-        'biaya_administrasi' : [0, 0, 5, 5]
-    }
+    'debit' : [1000, 2000, 3000, 4000],
+    'kredit' : [0, 0, 1, 2],
+    'bunga' : [5, 10, 6, 7], # dalam persen
+    'biaya_administrasi' : [0, 0, 5, 5]
 }
 
 class bank:
@@ -79,56 +77,39 @@ class bank:
         return False
     
     def tambahData(self, tujuan, role):
-        if role != 'teller':    
-            new_username, new_name, new_password = self.sign_up()
-            tujuan['username'].append(new_username)
-            tujuan['name'].append(new_name)
-            tujuan['password'].append(new_password)
-            print('Data Telah Ditambahkan!')
-        else:
-            new_username, new_name, new_password = self.sign_up()
-
-    def hapusData(self, tujuan, index, role):
-        if role != 'teller':
-            tujuan['username'].pop(index)
-            tujuan['name'].pop(index)
-            tujuan['password'].pop(index)
-            print('Data Telah Dihapus !')
+        new_username, new_name, new_password = self.sign_up()
+        tujuan['username'].append(new_username)
+        tujuan['name'].append(new_name)
+        tujuan['password'].append(new_password)
+        if role == 'cs':
+            tujuan['transaksi'].append(int(input('Masukkan Nilai Transaksi Pertama: ')))
+            tujuan['debit'].append(0)
+            tujuan['kredit'].append(0)
+            tujuan['bunga'].append(0)
+            tujuan['biaya_administrasi'].append(0)
+        print('Data Telah Ditambahkan')      
 
     def gantiData(self, tujuan, role):
-        if role != 'teller':
-            old_username, old_password = self.sign_in()
-            if self.cari_akun(old_username, old_password, tujuan):
-                for i, username in enumerate(tujuan['username']):
-                    if username == old_username:
-                        print('Tolong Isi Dengan Data Baru :')
+        old_username, old_password = self.sign_in()
+        if self.cari_akun(old_username, old_password, tujuan):
+            for i, username in enumerate(tujuan['username']):
+                if username == old_username:
+                    print('Tolong Isi Dengan Data Baru :')
+                    if role != 'teller':    
                         tujuan['username'][i], tujuan['name'][i], tujuan['password'][i] = self.sign_up()
-                print('Data Telah Diubah!')
-            else:
-                print('Data Tidak Ditemukan!')
-                tambah = input('Ingin Menambah Data Baru (y/n)? ')
-                if tambah.lower() == 'y':
-                    self.tambahData(tujuan, role)
+                        if role == 'cs':
+                            tujuan['transaksi'][i] = int(input('Masukkan Nilai Transaksi Yang Baru: '))
+                    elif role == 'teller':
+                        tujuan['debit'][i] = int(input('Masukkan Nilai Debit Yang Baru: '))
+                        tujuan['kredit'][i] = int(input('Masukkan Nilai Kredit Yang Baru: '))
+                        tujuan['bunga'][i] = int(input('Masukkan Nilai Bunga Yang Baru (dalam persen) : '))
+                        tujuan['biaya_administrasi'][i] = int(input('Masukkan Nilai Biaya Administrasi Yang Baru: '))
+            print('Data Telah Diubah!')
         else:
-            cari_username, cari_password = self.sign_in()
-            if self.cari_akun(cari_username, cari_password, tujuan):
-                for i, username in enumerate(tujuan['username']):
-                    if username == cari_username:
-                        old_data = tujuan['debit'][i]
-                        tujuan['debit'][i] = int(input('sign_inkan Nilai Debit Yang Baru: '))
-                        tujuan['kredit'][i] = int(input('sign_inkan Nilai Kredit Yang Baru: '))
-                        tujuan['bunga'][i] = int(input('sign_inkan Nilai Bunga Yang Baru (dalam persen) : '))
-                        tujuan['biaya_administrasi'][i] = int(input('sign_inkan Nilai Biaya Administrasi Yang Baru: '))
-                        if old_data != tujuan['debit'][i]:
-                            print('Data Telah Diubah !')
-                        else:
-                            print('Data Tidak Berhasil Diubah! ')
-                            self.gantiData(tujuan, role)
-            else:
-                print('Data Tidak Ditemukan!')
-                tambah = input('Ingin Menambah Data Baru (y/n)? ')
-                if tambah.lower() == 'y':
-                    self.tambahData(tujuan)
+            print('Data Tidak Ditemukan!')
+            tambah = input('Ingin Menambah Data Baru (y/n)? ')
+            if tambah.lower() == 'y':
+                self.tambahData(tujuan, role)
 
     def cek_anggota(self, role, key):
         print(f'No.\tNama\t{key}')
@@ -156,7 +137,6 @@ class Admin(bank):
         super().__init__(username, name, password, mode)
     
     def tambah_data(self, edit):
-        self.cek_anggota(direktur, 'name')
         print('Tolong isi data dibawah ini: ')
         self.tambahData(edit, 'direktur')
 
@@ -178,8 +158,7 @@ class Admin(bank):
         print('Pilih Menu:')
         print(f'1. Tambah {destination} Baru')
         print(f'2. Edit {destination}')
-        print(f'3. Hapus {destination}')
-        print('4. Kembali')
+        print('3. Kembali')
 
 class Direktur(bank):
     def __init__(self, username, name, password, mode):
@@ -216,12 +195,13 @@ class CustomerService(bank):
     def tambah_nasabah(self):
         print('Tolong Isi Data Di bawah ini: ')
         tujuan = nasabah
-        self.tambahData(tujuan, 'teller')
+        self.tambahData(tujuan, 'cs')
     
     def edit_nasabah(self):
+        self.cek_anggota(nasabah, 'transaksi')
         print('Pilih Data Nasabah yang ingin Diganti')
         tujuan = nasabah
-        self.gantiData(tujuan)
+        self.gantiData(tujuan, 'cs')
 
     def verifikasi(self):
         return self.cari_akun(self.username, self._password, self.mode)
@@ -293,8 +273,8 @@ while menu == True:
         else :
             print('Akun Tidak Ditemukan!')
     elif role == 2:
-        username, password = aplikasi.sign_in()
-        mode = Direktur(username, password, direktur)
+        username, name, password = aplikasi.login(direktur)
+        mode = Direktur(username, name, password, direktur)
         if mode.verifikasi():
             while True:
                 mode.menu()
@@ -310,10 +290,11 @@ while menu == True:
                 else:
                     break
     elif role == 3:
-        username, password = aplikasi.sign_in()
-        mode = CustomerService(username, password, customer_service)
+        username, name, password = aplikasi.login(customer_service)
+        mode = CustomerService(username, name, password, customer_service)
         if mode.verifikasi():
             while True:
+                mode.menu()
                 opsi = int(input('Pilihanmu: '))
 
                 if opsi == 1:

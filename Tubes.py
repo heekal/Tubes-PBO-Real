@@ -242,13 +242,14 @@ class Teller(bank):
         print('3. Keluar')
 
 aplikasi = bank('', '', '', '')
+
 start = True
+
 while start == True:
     role = aplikasi.main_menu()
     if role == 1:
         username, name, password = aplikasi.login(admin)
         mode = Admin(username, name, password, admin)
-        
         if mode.verifikasi():
             while True:
                 mode.menu()

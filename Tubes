@@ -1,0 +1,342 @@
+admin = {
+    'username': ['admin1', 'admin2'],
+    'password': ['123', '321']
+}
+
+direktor = {
+    'username': ['direct1', 'direct2'],
+    'password': ['123', '321']
+}
+
+customer_service = {
+    'username' : ['cs1', 'cs2'],
+    'password' : ['123', '321']
+}
+
+teller = {
+    'username': ['teller1', 'teller2'],
+    'password': ['123', '321']
+}
+
+nasabah = {
+    'username' : ['Haikal', 'Luna'],
+    'password' : ['123', '321'],
+    'transaksi' : [1050, 2020],
+    'keuangan' : {
+        'debit' : [1000, 2000],
+        'kredit' : [0, 0],
+        'bunga' : [5, 10], # dalam persen
+        'biaya_administrasi' : [0, 0]
+    }
+}
+
+# parent class sebagai fungsi pada aplikasi bank
+# parent class ini bisa digunakan oleh admin, direktor, customer service, dan teller
+ 
+class bank:
+    def __init__(self, username, password, mode):
+        self.username = username
+        self.password = password
+        self.mode = mode
+    
+    def main_menu(self):
+        print('Pilih Menu: ')
+        print('1. masuk sebagai Admin')
+        print('2. masuk sebagai Direktor')
+        print('3. masuk sebagai Customer Service')
+        print('4. masuk sebagai Teller')
+
+    # ini biar bisa dipanggil berkali"
+    def masuk(self):
+        username = input('Enter Username: ')
+        password = input('Enter Password: ')
+        return username, password
+
+    # ini bukan untuk mencari data di jabatan yang sama
+    # melainkan mencari data di jabatan yang berbeda
+    def cari_akun(self):
+        for i, j in zip(self.mode['username'], self.mode['password']):
+            if self.username == i and self.password == j:
+                return True
+        return False
+
+    def tambahData(self, tujuan):
+        # tujuan artinya Directury yang ingin di tambah
+        # cuma bisa dilakukan oleh admin dan customer service
+
+        new_username, new_password = bank.masuk()
+        tujuan['username'].append(new_username)
+        tujuan['password'].append(new_password)
+
+        print('Data Telah Ditambahkan!')
+
+    def gantiData(self, tujuan, role):
+        # ganti untuk mengganti data di Directury yang telah ada
+        # cuma bisa dilakukan oleh admin dan customer service
+
+        if role != 'teller':
+            # old username dan password itu untuk menyimpan username dan password yang mau di ganti
+            old_username, old_password = bank.masuk()
+
+            # cara baca:
+            # 1. kalau akun yang dicari itu  ada, maka 
+            if bank.cari_akun(self, tujuan, old_username, old_password):
+                # i akan menyimpan indeks yang sama dengan username tujuan
+                for i, name in enumerate(tujuan['username']):
+                    # name diisi dengan nama di tujuan['username']
+                    # kalau nama sama old username maka akan nama pada indeks tersebut bakalan di ganti
+                    if name == old_username:
+                        tujuan['username'][i], tujuan['password'][i] = bank.masuk()
+                print('Data Telah Diubah!')
+            
+            # 2. kalau akun yang mau diganti ternyata tidak ada.
+            else:
+                print('Data Tidak Ditemukan!')
+
+                # ini kalau semisalnya mau tambah data jika mau
+                tambah = input('Ingin Menambah Data Baru (y/n)? ')
+                if tambah.lower() == 'y':
+                    bank.tambahData(tujuan)
+        else:
+            find_username, find_password = bank.masuk()
+
+            if bank.cari_akun(self, tujuan, find_username, find_password):
+                for i, name in enumerate(tujuan['username']):
+                    if name == old_username:
+                        old_data = tujuan['debit'][i]
+
+                        tujuan['debit'][i] = int(input('Masukkan Nilai Debit Yang Baru: '))
+                        tujuan['kredit'][i] = int(input('Masukkan Nilai Kredit Yang Baru: '))
+                        tujuan['bunga'][i] = int(input('Masukkan Nilai Bunga Yang Baru (dalam persen) : '))
+                        tujuan['biaya_administrasi'][i] = int(input('Masukkan Nilai Biaya Administrasi Yang Baru: '))
+                        
+                        if old_data != tujuan['debit'][i]:
+                            print('Data Telah Diubah !')
+                        else:
+                            print('Data Tidak Berhasil Diubah! ')
+            else:
+                print('Data Tidak Ditemukan!')
+
+                tambah = input('Ingin Menambah Data Baru (y/n)? ')
+                if tambah.lower() == 'y':
+                    bank.tambahData(tujuan)
+
+    def cek_anggota(self, role, key):
+        print(f'No.\tNama\t{str(key)}')
+        for i in range(len(role[key])):
+             print(f"{i+1}.\t{role[key][i]}\t{role[key][i]}")
+
+    def cek_keuangan(self, find, key):
+        # role adalah parameter yang akan berisi Direktor atau bukan.
+        total = 0
+        
+        # ini untuk melihat data transaksi keuangan nasabah
+        if find == 'transaksi' : 
+            print(f'No.\tNama\tTransaksi')
+            for i in range(len(key['transaksi'])):
+                print(f"{i+1}.\t{key['username'][i]}\t{key['transaksi'][i]}")
+        
+        # ini untuk melihat laporan keuangan bank
+        else:
+            for i in range(len(key['transaksi'])):
+                if isinstance(key['transaksi'][i], int):
+                    total += key['transaksi'][i]
+
+            if total != 0:
+                return total
+    
+    def laporan_keuangan(self, role):
+        print(f'Nilai keuangan bank ini adalah sebesar: {bank.cek_keuangan(role)}')
+
+class Admin(bank):
+    def __init__(self, username, password, mode):
+        super().__init__(username, password, mode)
+    
+    def tambah_data(self, edit):
+        # edit di sini artinya data yang ingin di edit
+        # bisa mengedit direktur atau teller
+        bank.tambahData(edit)
+
+    def edit_data(self, edit):
+        # sama seperti tambah_data
+        bank.gantiData(edit)
+
+    def verifikasi(self):
+        return bank.cari_akun(self)
+
+    def menu(self):
+        print('Pilih Jabatan Yang Ingin Diganti:')
+        print('1. Direktor')
+        print('2. Teller')
+        print('3. Keluar')
+
+    def menu_ganti(self, destination):
+        print('Pilih Menu:')
+        print(f'1. Tambah {destination} Baru')
+        print(f'2. Edit {destination}')
+        print('3. Kembali')
+
+class Direktor(bank):
+    def __init__(self, username, password, mode):
+        super().__init__(username, password, mode)
+
+    def lihat_transaksi(self):
+        tujuan = nasabah
+        cari = 'transaksi'
+        bank.cek_keuangan(cari, tujuan)
+    
+    def lihat_laporan(self):
+        tujuan = nasabah
+        cari = ''
+        bank.laporan_keuangan(cari, tujuan)
+
+    def lihat_data(self, tujuan, key):
+        # tujuan bisa saja berisi data kustomer service atau teller
+        # key disini artinya
+        bank.cek_anggota(tujuan, key)
+    
+    def verifikasi(self):
+        return bank.cari_akun(self.username, self.password)
+
+    def menu(self):
+        print('Pilih Menu')
+        print('1. Lihat Data Transaksi Keuangan Nasabah ')
+        print('2. Lihat Laporan Keuangan Bank')
+        print('3. Lihat Data Customer Service')
+        print('4. Lihat Data Teller')
+        print('5. Keluar')
+
+class CustomerService(bank):
+    def __init__(self, username, password, mode):
+        super().__init__(username, password, mode)
+    
+    def tambah_nasabah(self):
+        tujuan = nasabah
+        bank.tambahData(tujuan)
+    
+    def edit_nasabah(self):
+        tujuan = nasabah
+        bank.gantiData(tujuan)
+
+    def verifikasi(self):
+        return bank.cari_akun(self.username, self.password)
+    
+    def menu(self):
+        print('Pilih Menu: ')
+        print('1. Menambah Data Nasabah')
+        print('2. Mengedit Data Nasabah')
+        print('3. Keluar')
+    
+class Teller(bank):
+    def __init__(self, username, password, mode):
+        super().__init__(username, password, mode)
+    
+    def tambah_data_nasabah(self):
+        pass
+
+    def lihat_data_nasabah(self):
+        pass
+
+    def verifikasi(self):
+        return bank.cari_akun(self.username, self.password)
+
+    def menu(self):
+        print('Pilih Menu: ')
+        print('1. Tambah Data Transaksi Nasabah')
+        print('2. Lihat Data Transaksi Nasabah')
+        print('3. Keluar')
+
+aplikasi = bank('', '', '')
+
+menu = True
+while menu == True:
+    aplikasi.main_menu()
+    role = int(input('Silakan Pilih Jenis Akun Kamu: '))
+
+    if role == 1:
+        username, password = aplikasi.masuk()
+        mode = Admin(username, password, admin)
+        
+        if mode.verifikasi():
+            while True:
+                mode.menu()
+                jabatan = int(input('Pilihan Kamu: '))
+
+                while jabatan > 0:
+                    if jabatan == 1:
+                        mode = direktor
+                        destination = 'direktor'
+                    elif jabatan == 2:
+                        mode = teller
+                        destination = 'teller'
+                    elif jabatan == 3:
+                        break
+
+                    mode.menu_ganti(destination)
+                    option = int(input('Opsi Kamu: '))
+
+                    if option == 1:
+                        print('Tolong isi data dibawah ini:')
+                        mode.tambah_data(mode)
+                    elif option == 2:
+                        print('Tolong isi data yang ingin di ganti')
+                        mode.gantiData(mode)
+                    else:
+                        break
+                            
+                if role == 3:
+                    break
+
+        else :
+            print('Akun Tidak Ditemukan!')
+
+    elif role == 2:
+        username, password = aplikasi.masuk()
+        mode = Direktor(username, password, direktor)
+
+        if mode.verifikasi():
+            while True:
+                mode.menu()
+                option = int(input('Pilihanmu: '))
+
+                if option == 1:
+                    mode.lihat_transaksi()
+                elif option == 2:
+                    mode.lihat_laporan()
+                elif option == 3:
+                    mode.lihat_data(customer_service, 'password')
+                elif option == 4:
+                    mode.lihat_data(teller, 'password')
+                else:
+                    break
+
+    elif role == 3:
+        username, password = aplikasi.masuk()
+        mode = CustomerService(username, password, customer_service)
+
+        if mode.verifikasi():
+            while True:
+                opsi = int(input('Pilihanmu: '))
+
+                if opsi == 1:
+                    print('Tolong isi data dibawah ini: ')
+                    mode.tambah_nasabah()
+                elif opsi == 2:
+                    print('Pilih Data Nasabah yang ingin Diganti')
+                    mode.edit_nasabah()
+                else: 
+                    break
+
+    elif role == 4:
+        username, password = aplikasi.masuk()
+        mode = Teller(username, password, teller)
+
+        if mode.verifikasi():
+            while True:
+                mode.menu()
+                opsi = int(input('Pilihan kamu: '))
+
+                if opsi == 1:
+                    mode.tambah_data_nasabah()
+                elif opsi == 2:
+                    mode.lihat_data_nasabah()

@@ -47,6 +47,7 @@ class bank:
         print('3. Masuk Sebagai Customer Service')
         print('4. Masuk Sebagai Teller')
         print('5. Keluar')
+        return int(input('Masukkan Jenis Akun Kamu: '))
     
     def keluar(self):
         print('Selamat Tinggal !')
@@ -111,10 +112,15 @@ class bank:
             if tambah.lower() == 'y':
                 self.tambahData(tujuan, role)
 
-    def cek_anggota(self, role, key):
-        print(f'No.\tNama\t{key}')
-        for i in range(len(role[key])):
-             print(f"{i+1}.\t{role['name'][i]}\t{role[key][i]}")
+    def cek_anggota(self, role, tujuan, key):
+        if role == 'teller':
+            print(f'No.\tUsername\tNama\tDebit\tKredit\tBunga\tBiaya Admin')
+            for i in range(len(tujuan[key])):
+                print(f"{i+1}.\t{tujuan['username'][i]}\t{tujuan['name'][i]}\t{tujuan['debit'][i]}\t{tujuan['kredit'][i]}\t{tujuan['bunga'][i]}\t{tujuan['biaya_administrasi'][i]}")
+        else:
+            print(f'No.\tUsername\t{key}')
+            for i in range(len(tujuan[key])):
+                print(f"{i+1}.\t{tujuan['username'][i]}\t{tujuan[key][i]}")
 
     def cek_keuangan(self, find, key):
         total = 0
@@ -141,7 +147,7 @@ class Admin(bank):
         self.tambahData(edit, 'direktur')
 
     def edit_data(self, edit):
-        self.cek_anggota(direktur, 'name')
+        self.cek_anggota('admin', direktur, 'name')
         print('Tolong isi data yang ingin di ganti: ')
         self.gantiData(edit, 'admin')
 
@@ -175,7 +181,7 @@ class Direktur(bank):
         self.laporan_keuangan(cari, tujuan)
 
     def lihat_data(self, tujuan, key):
-        self.cek_anggota(tujuan, key)
+        self.cek_anggota('direktur', tujuan, key)
     
     def verifikasi(self):
         return self.cari_akun(self.username, self._password, self.mode)
@@ -198,7 +204,7 @@ class CustomerService(bank):
         self.tambahData(tujuan, 'cs')
     
     def edit_nasabah(self):
-        self.cek_anggota(nasabah, 'transaksi')
+        self.cek_anggota('cs', nasabah, 'transaksi')
         print('Pilih Data Nasabah yang ingin Diganti')
         tujuan = nasabah
         self.gantiData(tujuan, 'cs')
@@ -218,13 +224,13 @@ class Teller(bank):
     
     def tambah_data_nasabah(self):
         tujuan = nasabah
-        self.cek_anggota(tujuan, 'username')
+        self.cek_anggota(' ', tujuan, 'username')
         print('Tolong Isi Data Dibawah ini:')
         self.gantiData(tujuan, 'teller')
 
     def lihat_data_nasabah(self):
         tujuan = nasabah
-        self.cek_anggota(tujuan, 'transaksi')
+        self.cek_anggota('teller', tujuan, 'transaksi')
 
     def verifikasi(self):
         return self.cari_akun(self.username, self._password, self.mode)
@@ -236,12 +242,9 @@ class Teller(bank):
         print('3. Keluar')
 
 aplikasi = bank('', '', '', '')
-
-menu = True
-while menu == True:
-    aplikasi.main_menu()
-    role = int(input('Silakan Pilih Jenis Akun Kamu: '))
-
+start = True
+while start == True:
+    role = aplikasi.main_menu()
     if role == 1:
         username, name, password = aplikasi.login(admin)
         mode = Admin(username, name, password, admin)
@@ -326,4 +329,4 @@ while menu == True:
         else :
             print('Akun Tidak Ditemukan!')
     elif role == 5:
-        menu = aplikasi.keluar()
+        start = aplikasi.keluar()
